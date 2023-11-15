@@ -1,11 +1,10 @@
 package com.example.course_work.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -16,17 +15,25 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private int numberOfRooms;
+    private String numberOfRooms;
 
-    private float square;
+    private String square;
 
-    private float livingSquare;
+    private String livingSquare;
 
-    private int yearOfConstruction;
+    private String kitchenSquare;
 
-    private float price;
+    private String yearOfConstruction;
 
+    private String price;
+
+    @Column(length = 10000)
     private String description;
+
+    private String floor;
+
+    @OneToMany
+    private Set<Image> images;
 
 
 }
