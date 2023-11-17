@@ -34,6 +34,55 @@ public class PropertyParser {
         return properties.iterator();
     }
 
+    public static List<Property> getAllProperties(int numberOfPages) throws IOException {
+        Document doc = Jsoup.connect(URL).
+                timeout(60000).get();
+        List<Property> result = new ArrayList<>();
+        List<String> urls = doc.select("a.styles_link__8m3I9").stream()
+                .limit(numberOfPages-1)
+                .map(el->el.attr("href"))
+                .collect(Collectors.toList());
+        result.addAll(getProperties(URL));
+        for (int i = 0; i < numberOfPages - 1; i++) {
+            result.addAll(getProperties("https://re.kufar.by/" + urls.get(i)));
+        }
+        return result;
+    }
+
+    private static List<Property> getProperties(String urlString) throws IOException {
+        Document doc = Jsoup.connect(urlString).
+                timeout(60000).get();
+        List<Property> result = new ArrayList<>();
+        Elements properties = doc.select("a.styles_wrapper__Q06m9"); //select all properties on the main page
+        for (Element property:properties){
+            String referenceToProperty = property.attr("href");
+            Document propertyMainPage = Jsoup.connect(referenceToProperty).timeout(6000).get();
+            Elements elements1 = propertyMainPage.select("div.styles_wrapper__YeeOd");
+            List<String> propertyInternals = elements1.select("div.styles_element___PgYv").stream()
+                    .map(element1 -> element1.select("span").text())
+                    .collect(Collectors.toList()); // select all properties under photo
+            for (int i = propertyInternals.size(); i < 6; i++) {
+                propertyInternals.add(null);
+            } // add null if not all Internals where under photo
+
+            String price = propertyMainPage.select("span.styles_price--main__KHbAp").text();
+            String imageLocation =
+                    propertyMainPage.select("div.swiper-zoom-container img").stream()
+                            .limit(1)
+                            .map(el->el.attr("src"))
+                            .findAny().get();
+            String description = propertyMainPage.select("#description div").get(0).select("div").stream()
+                    .filter(el->el.attr("itemprop").equals("description")).findAny().get().text();
+            propertyInternals.add(price);
+            propertyInternals.add(imageLocation);
+            propertyInternals.add(description);
+            result.add(toProperty(propertyInternals));
+        }
+
+
+        return result;
+    }
+
     public static List<Property> getAllPropertiesWithParallelism() throws IOException {
         Document doc = Jsoup.connect(URL).
                 timeout(60000).get();
@@ -180,7 +229,7 @@ public class PropertyParser {
         Image image = new Image();
         image.setLocation(internals.get(7));
         property.setDescription(internals.get(8));
-        Set<Image> images = new HashSet<>();
+        List<Image> images = new LinkedList<>();
         images.add(image);
         property.setImages(images);
         return property;

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -33,7 +34,7 @@ public class Property {
     private String floor;
 
     @OneToMany
-    private Set<Image> images;
+    private List<Image> images;
 
 
 }

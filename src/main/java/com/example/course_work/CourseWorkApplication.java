@@ -25,7 +25,7 @@ public class CourseWorkApplication {
 		SpringApplication.run(CourseWorkApplication.class, args);
 	}
 
-	@Bean
+	/*@Bean
 	public CommandLineRunner dataLoader(PropertyRepository propertyRepo,
 										ImageRepository imageRepo) {
 		return args -> {
@@ -45,7 +45,7 @@ public class CourseWorkApplication {
 			thread.start();
 			thread.join();
 		};
-	}
+	}*/
 
 
 }
